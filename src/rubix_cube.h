@@ -109,13 +109,13 @@ typedef struct rubix_cube_face {
 			rubix_cube_id.planes[0][1].sides[RUBIX_CUBE_SQUARE_FRONT], \
 			rubix_cube_id.planes[0][2].sides[RUBIX_CUBE_SQUARE_FRONT], \
 			\
+			rubix_cube_id.planes[0][3].sides[RUBIX_CUBE_SQUARE_FRONT], \
 			rubix_cube_id.planes[0][4].sides[RUBIX_CUBE_SQUARE_FRONT], \
 			rubix_cube_id.planes[0][5].sides[RUBIX_CUBE_SQUARE_FRONT], \
-			rubix_cube_id.planes[0][6].sides[RUBIX_CUBE_SQUARE_FRONT], \
 			\
+			rubix_cube_id.planes[0][6].sides[RUBIX_CUBE_SQUARE_FRONT], \
 			rubix_cube_id.planes[0][7].sides[RUBIX_CUBE_SQUARE_FRONT], \
-			rubix_cube_id.planes[0][8].sides[RUBIX_CUBE_SQUARE_FRONT], \
-			rubix_cube_id.planes[0][9].sides[RUBIX_CUBE_SQUARE_FRONT]  \
+			rubix_cube_id.planes[0][8].sides[RUBIX_CUBE_SQUARE_FRONT]  \
 		} \
 	}
 

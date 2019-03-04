@@ -27,7 +27,6 @@ $(OBJDIR):
 clean:
 	rm -rf $(TESTBIN) $(LIBNAME) $(OBJDIR)
 
-
 %.o: $(SRCDIR)/%.c
 	$(CC) $(LFLAGS) $(CFLAGS) -c $^ -o $(OBJDIR)/$@
 

@@ -68,27 +68,61 @@ const char rubix_cube_face_format_string[] =
  "+---+---+---+\n" ;
 
 const char rubix_cube_whole_cube_format_string[] =
- " Rubix cube\n"
- "(behind) +--+--+--+\n"
- "  D    / %c / %c / %c /|\n"
- "  ->  +--+--+--+ |\n"
- "     / %c / %c/  %c/| %c|	\n"
- "    +--+--+--+ | %c|	\n"
- "   / %c/ %c/ %c/| |/| <-- E (behind)\n"
- "  +--+--+--+ |/%c| %c|%c \n"
- "  | %c| %c| %c|/|%c|/|      	\n"
- "  +--+--+--+ |/| %c|%c     2  \n"
- "  | %c| %c| %c|%c/| %c|/           _.\n"
- "  +--+--+--+ |/%c       1    /|\n"
+ " ====Rubix cube====\n"
+ "        +--+--+--+\n"
+ "  TOP  / %c/ %c/ %c/ |\n"
+ "      +--+--+--+  |\n"
+ "     / %c/ %c/ %c/|  |\n"
+ "    +--+--+--+ |%c |	\n"
+ "   / %c/ %c/ %c/|%c|/ |   RIGHT\n"
+ "  +--+--+--+%c|/|%c/| \n"
+ "  | %c| %c| %c|/|%c|/ |      	\n"
+ "  +--+--+--+%c|/|%c |     2  \n"
+ "  | %c| %c| %c|/|%c|/           _.\n"
+ "  +--+--+--+%c|/       1     /|\n"
  "  | %c| %c| %c| /             /  \n"
  "  +--+--+--+^         0   / Direction of array of rubix cube face arrays\n"
- "       F ^\n"
- " (behind)|\n"
- "/\n" ;
+ "      FRONT \n"
+ " \n"
+ " \n" ;
 
 void rubix_cube_print_ascii(FILE * output_file, RubixCube * pRubix_cube) {
-	// TODO:
-	//fprintf(output_file,rubix_cube_whole_cube_format_string,
+
+	RubixCubeFace top_face = rubix_cube_get_face_of_side(pRubix_cube,RUBIX_CUBE_SQUARE_TOP) ;
+	RubixCubeFace front_face = rubix_cube_get_face_of_side(pRubix_cube,RUBIX_CUBE_SQUARE_FRONT) ;
+	RubixCubeFace right_face = rubix_cube_get_face_of_side(pRubix_cube,RUBIX_CUBE_SQUARE_RIGHT) ;
+
+	printf("hello\n") ;
+
+	fprintf(output_file,rubix_cube_whole_cube_format_string,
+		rubix_cube_get_char_of_color(top_face.squares[0]),
+		rubix_cube_get_char_of_color(top_face.squares[1]),
+		rubix_cube_get_char_of_color(top_face.squares[2]),
+		rubix_cube_get_char_of_color(top_face.squares[3]),
+		rubix_cube_get_char_of_color(top_face.squares[4]),
+		rubix_cube_get_char_of_color(top_face.squares[6]),
+		rubix_cube_get_char_of_color(right_face.squares[2]),
+		rubix_cube_get_char_of_color(top_face.squares[6]),
+		rubix_cube_get_char_of_color(top_face.squares[7]),
+		rubix_cube_get_char_of_color(top_face.squares[8]),
+		rubix_cube_get_char_of_color(right_face.squares[1]),
+		rubix_cube_get_char_of_color(right_face.squares[0]),
+		rubix_cube_get_char_of_color(right_face.squares[5]),
+		rubix_cube_get_char_of_color(front_face.squares[0]),
+		rubix_cube_get_char_of_color(front_face.squares[1]),
+		rubix_cube_get_char_of_color(front_face.squares[2]),
+		rubix_cube_get_char_of_color(right_face.squares[4]),
+		rubix_cube_get_char_of_color(right_face.squares[3]),
+		rubix_cube_get_char_of_color(right_face.squares[8]),
+		rubix_cube_get_char_of_color(front_face.squares[3]),
+		rubix_cube_get_char_of_color(front_face.squares[4]),
+		rubix_cube_get_char_of_color(front_face.squares[5]),
+		rubix_cube_get_char_of_color(right_face.squares[7]),
+		rubix_cube_get_char_of_color(right_face.squares[6]),
+		rubix_cube_get_char_of_color(front_face.squares[6]),
+		rubix_cube_get_char_of_color(front_face.squares[7]),
+		rubix_cube_get_char_of_color(front_face.squares[8])
+	) ;
 
 }
 
@@ -127,5 +161,6 @@ void rubix_cube_print_face_ascii(FILE * output_file, RubixCube * pRubix_cube, Ru
 void makeprint() {
 	RubixCube test = rubix_cube_generate_solved() ;
 	rubix_cube_print_all_faces_ascii(stdout,&test) ;
+	rubix_cube_print_ascii(stdout,&test) ;
 }
 

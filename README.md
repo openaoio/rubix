@@ -2,6 +2,11 @@
 
 ### A rubix cube simulation library
 
+#### Done; In testing
+
+* Rubix cube data representations
+* Visual representations of the cube
+
 ##### In progress
 
 * Rubix cube data representations
