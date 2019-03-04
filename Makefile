@@ -4,13 +4,19 @@
 
 CC 	= gcc
 CFLAGS  = -g -Wall -Werror -std=gnu11
-OBJECTS = test_rubix_cube.o rubix_cube.o
-BIN	= test
+LFLAGS  = -fPIC -shared
+OBJECTS = rubix_cube.o
+TESTOBJ = test_rubix_cube.o
+TESTBIN	= test
+LIBNAME = librubix.so
 SRCDIR  = src
 OBJDIR  = obj
 
 all: $(OBJDIR) $(OBJECTS)
-	$(CC) $(CFLAGS) $(patsubst %.o,$(OBJDIR)/%.o, $(OBJECTS)) -o $(BIN)
+	$(CC) $(LFLAGS) $(CFLAGS) $(patsubst %.o,$(OBJDIR)/%.o, $(OBJECTS)) -o $(LIBNAME)
+
+test: $(OBJDIR) $(OBJECTS) $(TESTOBJ)
+	$(CC) $(CFLAGS) $(patsubst %.o,$(OBJDIR)/%.o, $(OBJECTS)) $(patsubst %.o,$(OBJDIR)/%.o, $(TESTOBJ)) -o $(TESTBIN)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o 
@@ -19,11 +25,9 @@ $(OBJDIR):
 	mkdir $(OBJDIR)
 
 clean:
-	rm -rf $(BIN) $(OBJDIR)
-
-	
+	rm -rf $(TESTBIN) $(LIBNAME) $(OBJDIR)
 
 
 %.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $^ -o $(OBJDIR)/$@ 
+	$(CC) $(LFLAGS) $(CFLAGS) -c $^ -o $(OBJDIR)/$@
 

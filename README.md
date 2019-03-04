@@ -16,6 +16,7 @@
 
 ### How to build the tests:
 
+Initialize and update submodules: `git submodule init && git submodule update`
 Build with: `make`
 Run with: `./test`
 

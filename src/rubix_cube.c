@@ -14,6 +14,20 @@ RubixCube rubix_cube_generate_solved(void) {
 	return RUBIX_CUBE_SOLVED_LITERAL ;	
 }
 
+#define TTT "whatup"
+
+struct a {
+	int x ;
+	int y ;
+} ;
+
+struct a hello() {
+	printf("hey %d \n",RUBIX_CUBE_COLOR_WHITE) ;
+	struct a x = { .x = 5, .y = 6 } ;
+	return x ;
+}
+
+
 RubixCube rubix_cube_generate_scrambled(rubix_cube_seed_t seed) {
 	// TODO: stub, will shuffle
 	return RUBIX_CUBE_SOLVED_LITERAL ;	
@@ -89,8 +103,29 @@ void rubix_cube_print_ascii(FILE * output_file, RubixCube * pRubix_cube) {
 	rubix_cube_get_char_of_color(rubix_cube_face_id.squares[7]), \
 	rubix_cube_get_char_of_color(rubix_cube_face_id.squares[8])
 
+void rubix_cube_print_all_faces_ascii(FILE * output_file, RubixCube * pRubix_cube) {
+	printf("Top face:\n") ;
+	rubix_cube_print_face_ascii(stdout,pRubix_cube,RUBIX_CUBE_SQUARE_TOP) ;
+	printf("Front face:\n") ;
+	rubix_cube_print_face_ascii(stdout,pRubix_cube,RUBIX_CUBE_SQUARE_FRONT) ;
+	printf("Right face:\n") ;
+	rubix_cube_print_face_ascii(stdout,pRubix_cube,RUBIX_CUBE_SQUARE_RIGHT) ;
+	printf("Left face:\n") ;
+	rubix_cube_print_face_ascii(stdout,pRubix_cube,RUBIX_CUBE_SQUARE_LEFT) ;
+	printf("Back face:\n") ;
+	rubix_cube_print_face_ascii(stdout,pRubix_cube,RUBIX_CUBE_SQUARE_BACK) ;
+	printf("Bottom face:\n") ;
+	rubix_cube_print_face_ascii(stdout,pRubix_cube,RUBIX_CUBE_SQUARE_BOTTOM) ;
+}
+
 void rubix_cube_print_face_ascii(FILE * output_file, RubixCube * pRubix_cube, RubixCubeSide side) {
 	RubixCubeFace face = rubix_cube_get_face_of_side(pRubix_cube,side) ;
 	fprintf(output_file,rubix_cube_face_format_string,
 		RUBIX_CUBE_FACE_TO_PRINTF_ARGS(face) ) ;
 }
+
+void makeprint() {
+	RubixCube test = rubix_cube_generate_solved() ;
+	rubix_cube_print_all_faces_ascii(stdout,&test) ;
+}
+
