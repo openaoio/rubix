@@ -15,7 +15,8 @@
 
 #### In Development:
 
-* Enhancements to interactive rubix cube shell via python
+* A million monkeys
+* Enhancements to interactive rubix cube shell via python (e.g. disambiguation)
 
 #### Down the road:
 

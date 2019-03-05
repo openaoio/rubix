@@ -4,6 +4,7 @@
 /* Library dependencies */
 
 #include <stdio.h>
+#include <pthread.h> /* for monkeys */
 
 /* Library constants */
 
@@ -104,7 +105,7 @@ typedef unsigned long long int RubixCubeSeed ;
  * (behind)|
  *
  * Library functions will maintain this "perspective" unless otherwise noted.
- * rubix_cube_rotate_quadset() is a notable exceptiong
+ * rubix_cube_rotate_quadset() is a notable exception
  */
 
 
@@ -114,7 +115,9 @@ typedef struct rubix_cube_piece {
 	RubixCubeColor sides[RUBIX_CUBE_SIDE_COUNT] ;
 } RubixCubePiece ;
 
+size_t rubix_cube_global_count ;
 typedef struct rubix_cube {
+	size_t ID ;
 	RubixCubePiece planes[RUBIX_CUBE_PLANE_COUNT][RUBIX_CUBE_PIECES_PER_PLANE] ;
 } RubixCube ;
 
@@ -288,8 +291,8 @@ typedef struct rubix_cube_subrotation_set {
 } RubixCubeSubrotationSet ;
 
 typedef struct rubix_cube_piece_reference {
-	size_t plane ;
-	size_t index ;
+	size_t 				plane ;
+	size_t 				index ;
 } RubixCubePieceReference ;
 
 typedef struct rubix_cube_face_rotation_data {
@@ -357,12 +360,30 @@ const char * rubix_cube_get_face_rotation_string(RubixCubeFaceRotation rotation)
 
 void rubix_cube_solve_scrambled_from_seed(RubixCube * pRubix_cube, RubixCubeSeed seed) ;
 
-RubixCubeScramble * rubix_cube_scramble_allocate() ;
+RubixCubeScramble * rubix_cube_scramble_allocate(RubixCubeSeed seed,size_t intensity) ;
 void rubix_cube_scramble_free() ;
 
 void rubix_cube_apply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) ;
 void rubix_cube_unapply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) ;
 
 RubixCubeSeed rubix_cube_generate_seed() ;
+
+/* begin monkey section */
+
+typedef enum rubix_cube_monkey_office {
+	RUBIX_CUBE_MONKEY_ENTREPRENEUR, /* this one works 80+ hours per week */
+	RUBIX_CUBE_MONKEY_MANAGER,	/* this one works close to 60 */
+	RUBIX_CUBE_MONKEY_WORKER	/* a purely 9-5 kind of monkey */
+} RubixCubeMonkeyOffice ;
+
+typedef struct rubix_cube_monkey RubixCubeMonkey ;
+typedef struct rubix_cube_monkey {
+	RubixCube * 			cube ;
+	pthread_mutex_t			cube_mutex ;
+	RubixCubeMonkeyOffice 		office ;
+	RubixCubeScramble * 		history ;
+	RubixCubeMonkey * 		direct_reports ;
+	size_t 				direct_report_count ;
+} RubixCubeMonkey ;
 
 #endif // RUBIX_CUBE_H

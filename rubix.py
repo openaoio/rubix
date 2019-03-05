@@ -81,6 +81,7 @@ class CubeShell:
 
     def show_help(self,tokens):
         print("\
+====[CUBE SHELL COMMAND REFERENCE]====\n\
 exit:       quit the program\n\
 help:       show this message\n\
 new:        start a new cube, discarding the old one\n\
@@ -93,7 +94,8 @@ unscramble: unscramble the cube based on most recent scramble\n\
 check:      check if the cube is solved\n\
 history:    execute previous commands, defaults to previous\n\
           n = steps back in history (max 50)\n\
-!           alias for history\n"
+!           alias for history\n\
+monkeys:    a million monkeys and a million typewriters...\n"
             )
         return
 
@@ -103,27 +105,34 @@ history:    execute previous commands, defaults to previous\n\
         return
 
     ROTATION_ALIASES =  {
+            "-90"   :"clockwise",
+            "-pi/2" :"clockwise",
             "c"     :"clockwise",
             "cw"    :"clockwise",
             "cl"    :"clockwise",
+            "90"    :"counterclockwise",
+            "pi/2"  :"counterclockwise",
             "cc"    :"counterclockwise",
             "ccl"   :"counterclockwise",
             "ccw"   :"counterclockwise",
+            "180"   :"double",
+            "-180"  :"double",
+            "pi"    :"double",
+            "-pi"   :"double",
             "d"     :"double",
             "dd"    :"double",
             "ddd"   :"double"
             }
 
-    def disambiguate_query(self,query,options):
-        new_options = options
-        for i in range(len(query)):
-            for j in range(len(options)):
-                if query[i] != options[j][i]:
-                    new_options.remove(options[i][i])
-            if len(new_options) == 1:
-                return new_options[0]
-            elif len(new_options) == 0:
-                return None
+    @classmethod
+    def disambiguate_query(cls,query,options):
+        matching_options = []
+        for string in options:
+            print(string[:len(query)])
+            # If the current option string is long enough and it contains the substring
+            if not len(string) < len(query) and query == string[:len(query)]:
+                matching_options.append(string)
+        return matching_options
 
     def rotate(self,tokens):
         face = "invalid"
@@ -169,6 +178,10 @@ history:    execute previous commands, defaults to previous\n\
         else:
             print("The cube is scrambled")
 
+    def monkeys(self,tokens):
+        if not self.cube.is_solved()
+
+
     MAXIMUM_ARCHEOLOGY = 50 # arbitrary
     def historic_execution(self,tokens):
         #print("depth: %d" % self.historic_execution_depth)
@@ -200,6 +213,8 @@ history:    execute previous commands, defaults to previous\n\
     def default(self):
             if len(self.history) > 1 + self.historic_execution_depth:
                 self.historic_execution([])
+            else:
+                pass # nop if no history to query
 
     COMMANDS = {
             "exit"      :exit,
@@ -211,10 +226,13 @@ history:    execute previous commands, defaults to previous\n\
             "unscramble":unscramble,
             "check"     :check,
             "history"   :historic_execution,
-            "!"         :historic_execution
+            "!"         :historic_execution,
+            "monkeys"   :solve_by_brute_force
             }
 
     PS1 = ">> "
+
+    UNKNOWN_COMMAND_MESSAGE = "Unknown command...\n"
 
     def parse(self,raw_command):
         if not raw_command:
@@ -224,6 +242,7 @@ history:    execute previous commands, defaults to previous\n\
                 tokens = raw_command.lower().split()
                 fun = self.COMMANDS[tokens[0]]
             except:
+                print(self.UNKNOWN_COMMAND_MESSAGE)
                 self.show_help(None)
             else:
                 fun(self,tokens)
@@ -258,20 +277,6 @@ history:    execute previous commands, defaults to previous\n\
 if __name__ == "__main__":
     CubeShell.launch()
 
-    # TODO
-    #def disambiguate_querry(query,options):
-    #    new_options = options
-    #    for i in range(len(query)):
-    #        for j in range(len(options)):
-    #            if i >= len(options[j]):
-    #               continue 
-    #            elif query[i] != options[j][i]:
-    #                new_options.remove(options[j])
-    #            #print(options[j][i])
-    #        print(new_options)
-    #        if len(new_options) == 1:
-    #            return new_options[0]
-    #        elif len(new_options) == 0:
-    #            return None
 
-#print(disambiguate_querry("to",RubixCube.FACES))
+
+print(disambiguate_querry("to",RubixCube.FACES))

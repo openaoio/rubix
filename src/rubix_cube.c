@@ -28,8 +28,15 @@ const char * RUBIX_CUBE_FACE_ROTATION_STRINGS[] = {
 	"Double"
 } ;
 
+size_t rubix_cube_global_count = 0 ;
+RubixCube _rubix_cube_generate_solved_with_ID() {
+	RubixCube new = RUBIX_CUBE_SOLVED_LITERAL ;
+	new.ID = rubix_cube_global_count++ ;
+	return new ;
+}
+
 RubixCube rubix_cube_generate_solved(void) {
-	return RUBIX_CUBE_SOLVED_LITERAL ;	
+	return _rubix_cube_generate_solved_with_ID() ;
 }
 
 RubixCube rubix_cube_generate_scrambled(RubixCubeSeed seed) {
@@ -650,9 +657,11 @@ int rubix_cube_equivelence_check(RubixCube * first, RubixCube * second) {
 	if (!first && !second) return 1 ;
 	if (!first || !second) return 0 ;
 
-	size_t color_values_per_cube = sizeof(RubixCube)/sizeof(RubixCubeColor) ;
-	RubixCubeColor *first_colors = (RubixCubeColor*)first;
-	RubixCubeColor *second_colors = (RubixCubeColor*)second;
+	/* subtract number of non-color values /sizeof(RubixCubeColor) of to get length of color array */
+	size_t color_values_per_cube = sizeof(RubixCube)/sizeof(RubixCubeColor) - sizeof(size_t)/sizeof(RubixCubeColor) ;
+	RubixCubeColor *first_colors = (RubixCubeColor*)&first->planes;
+	RubixCubeColor *second_colors = (RubixCubeColor*)&second->planes;
+
 
 	for(size_t i = 0; i < color_values_per_cube; ++i) {
 		if (first_colors[i] != second_colors[i]) return 0 ;
