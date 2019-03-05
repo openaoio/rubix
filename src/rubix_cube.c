@@ -647,7 +647,8 @@ void rubix_cube_print_piece_from_cube(RubixCube * pRubix_cube, unsigned plane, u
 
 int rubix_cube_equivelence_check(RubixCube * first, RubixCube * second) {
 	/* If either arg is null, the cubes are not equal, but if they are both null, they are indeed equal */
-	if (!first && !second) return 1 ; if (!first || !second) return 0 ;
+	if (!first && !second) return 1 ;
+	if (!first || !second) return 0 ;
 
 	size_t color_values_per_cube = sizeof(RubixCube)/sizeof(RubixCubeColor) ;
 	RubixCubeColor *first_colors = (RubixCubeColor*)first;
