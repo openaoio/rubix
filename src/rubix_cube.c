@@ -302,6 +302,16 @@ RubixCube * rubix_cube_allocate_solved() {
 	}
 	return new_cube ;
 }
+
+RubixCube * rubix_cube_allocate_scrambled(RubixCubeSeed seed) {
+
+	RubixCube * new_cube = rubix_cube_allocate_solved() ;
+
+	if (new_cube) *new_cube = rubix_cube_generate_scrambled(seed) ;
+
+	return new_cube ;
+}
+
 void rubix_cube_free(RubixCube * pRubix_cube) {
 	free(pRubix_cube) ;
 }
@@ -877,4 +887,57 @@ void rubix_cube_solve_scrambled_from_seed(RubixCube * pRubix_cube, RubixCubeSeed
 		rubix_cube_unapply_move(pRubix_cube,&moves[i-1]) ;
 	}
 
+}
+
+void rubix_cube_print_ascii_double_stdout(RubixCube * pRubix_cube) {
+	rubix_cube_print_ascii_double(stdout,pRubix_cube) ; 
+}
+
+RubixCubeSeed rubix_cube_generate_seed() {
+	return time(0) ;	
+}
+
+void rubix_cube_rotate_face_strings(RubixCube * pRubix_cube, const char * side, const  char * face_rotation) {
+	(void)pRubix_cube ;
+	printf("side: %s\nrotation: %s\n",side,face_rotation) ;
+}
+
+RubixCubeScramble * rubix_cube_scramble_allocate(RubixCubeSeed seed,size_t intensity) {
+	RubixCubeScramble * pNew ;
+	if (!(pNew = (RubixCubeScramble *)malloc(sizeof(RubixCubeScramble)))) return NULL ;
+
+	pNew->capacity = intensity ;
+	if(!(pNew->moves = (RubixCubeMove *)malloc(sizeof(RubixCubeMove) * pNew->capacity))) {
+		free(pNew); return NULL ;
+	} pNew->size = pNew->capacity ;
+
+	pNew->seed = seed ? seed : rubix_cube_generate_seed() ;
+	rubix_cube_generate_moves_from_seed(
+			pNew->seed,
+			pNew->size,
+			pNew->moves) ;
+	return pNew ;
+}
+
+void rubix_cube_scramble_free(RubixCubeScramble * pRubix_cube_scramble) {
+	if(pRubix_cube_scramble) {
+		if (pRubix_cube_scramble->moves) free(pRubix_cube_scramble->moves) ;
+		free(pRubix_cube_scramble) ;
+	}
+}
+
+int rubix_cube_get_default_scramble_intensity() {
+	return RUBIX_CUBE_SCRAMBLE_INTENSITY ;
+}
+
+void rubix_cube_apply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) {
+	for(size_t i = 0; i < pScramble->size; ++i) {
+		rubix_cube_apply_move(pRubix_cube,&pScramble->moves[i]) ;
+	}
+}
+
+void rubix_cube_unapply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) {
+	for(size_t i = pScramble->size; i > 0; --i) {
+		rubix_cube_unapply_move(pRubix_cube,&pScramble->moves[i-1]) ;
+	}
 }

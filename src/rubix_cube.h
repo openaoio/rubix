@@ -299,24 +299,33 @@ typedef struct rubix_cube_face_rotation_data {
 } RubixCubeFaceRotationData ;
 
 typedef struct rubix_cube_move {
-	RubixCubeSide side ;
-	RubixCubeFaceRotation rotation ;
+	RubixCubeSide		 	side ;
+	RubixCubeFaceRotation 		rotation ;
 } RubixCubeMove ;
+
+typedef struct rubix_cube_scramble {
+	RubixCubeMove * 		moves ;
+	size_t				size ;
+	size_t 				capacity ;
+	RubixCubeSeed 			seed ;
+} RubixCubeScramble ;
 
 /* Library Functions */
 
-RubixCube rubix_cube_generate_solved(void) ;
+RubixCube rubix_cube_generate_solved() ;
+RubixCube * rubix_cube_allocate_solved() ;
 
 #define RUBIX_CUBE_SCRAMBLE_INTENSITY 50
 RubixCube rubix_cube_generate_scrambled(RubixCubeSeed seed) ;
+RubixCube * rubix_cube_allocate_scrambled(RubixCubeSeed seed) ;
 
 void rubix_cube_print_ascii(FILE * output_file, RubixCube * pRubix_cube) ;
 void rubix_cube_print_ascii_double(FILE * output_file, RubixCube * pRubix_cube) ;
 void rubix_cube_print_ascii_stdout(RubixCube * pRubix_cube) ;
+void rubix_cube_print_ascii_double_stdout(RubixCube * pRubix_cube) ;
 
 void rubix_cube_print_face_ascii(FILE * output_file, RubixCube * pRubix_cube, RubixCubeSide side) ;
 
-RubixCube * rubix_cube_allocate_solved() ;
 void rubix_cube_free(RubixCube * pRubix_cube) ;
 void rubix_cube_rotate_front_face(RubixCube * pRubix_cube, RubixCubeFaceRotation face_rotation) ;
 void rubix_cube_rotate_top_face(RubixCube * pRubix_cube, RubixCubeFaceRotation face_rotation) ;
@@ -328,11 +337,13 @@ void rubix_cube_print_piece_from_cube(RubixCube * pRubix_cube, unsigned plane, u
 
 int rubix_cube_is_solved(RubixCube * pRubix_cube) ;
 int rubix_cube_equivelence_check(RubixCube * first, RubixCube * second) ;
+int rubix_cube_get_default_scramble_intensity() ;
 
 /*
  * TODO: documentation
  */
 void rubix_cube_rotate_face(RubixCube * pRubix_cube, RubixCubeSide side, RubixCubeFaceRotation face_rotation) ;
+void rubix_cube_rotate_face_strings(RubixCube * pRubix_cube, const char * side, const  char * face_rotation) ;
 
 void rubix_cube_apply_move(RubixCube * pRubixCube, RubixCubeMove * move) ;
 void rubix_cube_unapply_move(RubixCube * pRubixCube, RubixCubeMove * move) ;
@@ -345,5 +356,13 @@ const char * rubix_cube_get_side_string(RubixCubeSide side) ;
 const char * rubix_cube_get_face_rotation_string(RubixCubeFaceRotation rotation) ;
 
 void rubix_cube_solve_scrambled_from_seed(RubixCube * pRubix_cube, RubixCubeSeed seed) ;
+
+RubixCubeScramble * rubix_cube_scramble_allocate() ;
+void rubix_cube_scramble_free() ;
+
+void rubix_cube_apply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) ;
+void rubix_cube_unapply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) ;
+
+RubixCubeSeed rubix_cube_generate_seed() ;
 
 #endif // RUBIX_CUBE_H

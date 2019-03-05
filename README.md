@@ -11,15 +11,16 @@
 * Random scrambling by seed value
 * Unscrambling by seed value
 * Builds as shared library
+* Interactive rubix cube shell via python
 
 #### In Development:
 
-* Rubix cube cube solution algorithm implementation
+* Enhancements to interactive rubix cube shell via python
 
 #### Down the road:
 
-* Integration with my python shell/mathmatical expression resolver
 * Save/Load state to/from hard drive
+* Rubix cube cube solution algorithm implementation
 
 ### How to build the tests (which include some demos):
 
@@ -31,4 +32,8 @@ Clean the directory with `make clean`
 
 ### How to actually use the library:
 
-However you damn please, this code is open source
+However you damn please, this code is open source.
+
+That in mind, I recommend using the Python API instead of the C API, as it was hacked together in a day or so
+
+But, try out `make && python rubix.py` and see what happens
