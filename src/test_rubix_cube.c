@@ -1,5 +1,7 @@
 #include "rubix_cube.h"
 #include "../lil_test/src/lil_test.h"
+#include <time.h>
+
 
 TEST_SET(create_destroy,
 	TEST_CASE(on_stack,
@@ -212,9 +214,117 @@ TEST_SET(generic_rotation,
 		ASSERT(rubix_cube_is_solved(test)) ;
 
 		rubix_cube_free(test) ;	
+	) ;
+
+	TEST_CASE(do_then_undo_random,
+		srand(time(0)) ;
+
+		RubixCubeMove move = rubix_cube_generate_random_move() ;
+
+		RubixCube cube = rubix_cube_generate_solved() ;
+
+		rubix_cube_print_ascii_stdout(&cube) ;
+
+		printf("will apply...\n") ;
+		rubix_cube_apply_move(&cube,&move) ;
+		printf("Applied the following move:\n") ;
+		rubix_cube_print_move_string(&move) ;
+
+		rubix_cube_print_ascii_stdout(&cube) ;
+		ASSERT(!rubix_cube_is_solved(&cube)) ;
+
+		rubix_cube_unapply_move(&cube,&move) ;
+		printf("Unapplied the following move:\n") ;
+		rubix_cube_print_move_string(&move) ;
+
+		rubix_cube_print_ascii_stdout(&cube) ;
+		ASSERT(rubix_cube_is_solved(&cube)) ;
+	)
+
+	TEST_CASE(apply_unapply_100,
+		srand(time(0)) ;
+		RubixCubeMove moves[100] ;
+		RubixCube cube = rubix_cube_generate_solved() ;
+		for (size_t i = 0 ; i < 100; ++i) moves[i] = rubix_cube_generate_random_move() ;
+
+		printf("Applying the following moves:\n") ;
+		for (size_t i = 0 ; i < 100; ++i) {
+			rubix_cube_print_move_string(&moves[i]) ;
+			rubix_cube_apply_move(&cube,&moves[i]) ;
+		}
+
+		rubix_cube_print_ascii_stdout(&cube) ;
+		ASSERT(!rubix_cube_is_solved(&cube)) ;
+
+		printf("Un-Applying the following moves:\n") ;
+		for (size_t i = 100 ; i > 0; --i) {
+			rubix_cube_print_move_string(&moves[i-1]) ;
+			rubix_cube_unapply_move(&cube,&moves[i-1]) ;
+		}
+	
+		rubix_cube_print_ascii_stdout(&cube) ;
+		ASSERT(rubix_cube_is_solved(&cube)) ;
+	)
+
+	TEST_CASE(apply_unapply_5,
+		srand(time(0)) ;
+		RubixCubeMove moves[5] ;
+		RubixCube cube = rubix_cube_generate_solved() ;
+		for (size_t i = 0 ; i < 5; ++i) moves[i] = rubix_cube_generate_random_move() ;
+
+		printf("Applying the following moves:\n") ;
+		for (size_t i = 0 ; i < 5; ++i) {
+			rubix_cube_print_move_string(&moves[i]) ;
+			rubix_cube_apply_move(&cube,&moves[i]) ;
+		}
+
+		rubix_cube_print_ascii_stdout(&cube) ;
+		ASSERT(!rubix_cube_is_solved(&cube)) ;
+
+		printf("Un-Applying the following moves:\n") ;
+		for (size_t i = 5; i > 0; --i) {
+			rubix_cube_print_move_string(&moves[i-1]) ;
+			rubix_cube_unapply_move(&cube,&moves[i-1]) ;
+		}
+	
+		rubix_cube_print_ascii_stdout(&cube) ;
+		ASSERT(rubix_cube_is_solved(&cube)) ;
 	)
 )
-	
+
+TEST_SET(scrambling,
+	TEST_CASE(identical_seed,
+		RubixCubeSeed seed = time(0) ;
+		RubixCube a, b ;
+		a = rubix_cube_generate_scrambled(seed) ;
+		b = rubix_cube_generate_scrambled(seed) ;
+		ASSERT(rubix_cube_equivelence_check(&a,&b)) ;
+	) ;
+
+	TEST_CASE(unscramble_using_seed,
+		RubixCubeSeed seed = time(0) ;
+		RubixCube a = rubix_cube_generate_scrambled(seed) ;
+
+		ASSERT(!rubix_cube_is_solved(&a)) ;
+
+		rubix_cube_solve_scrambled_from_seed(&a,seed) ;
+
+		ASSERT(rubix_cube_is_solved(&a)) ;
+
+	) ;
+)
+
+TEST_SET(double_print,
+	TEST_CASE(solved,
+		RubixCube cube = rubix_cube_generate_solved() ;
+		rubix_cube_print_ascii_double(stdout,&cube) ;
+	) ;	
+	TEST_CASE(back_clockwise,
+		RubixCube cube = rubix_cube_generate_solved() ;
+		rubix_cube_rotate_face(&cube,RUBIX_CUBE_SQUARE_BACK,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_print_ascii_double(stdout,&cube) ;
+	) ;	
+) ;
 
 TEST_MAIN() ;
 

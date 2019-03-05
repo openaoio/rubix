@@ -8,15 +8,15 @@
 /* Library constants */
 
 /* Faces/sides of a square. */
-#define RUBIX_CUBE_SIDE_COUNT 6
+#define RUBIX_CUBE_SIDE_COUNT 		6
 
 /* NxNxN rubix cube. Note that no other values are yet supported, but might be in the future. */
-#define RUBIX_CUBE_SIDE_LENGTH 3 
-#define RUBIX_CUBE_PLANE_COUNT RUBIX_CUBE_SIDE_LENGTH
+#define RUBIX_CUBE_SIDE_LENGTH 		3 
+#define RUBIX_CUBE_PLANE_COUNT 		RUBIX_CUBE_SIDE_LENGTH
 
 /* Determine the size of each plane (in pieces) as a constant at compile time */
-#define RUBIX_CUBE_PIECES_PER_PLANE RUBIX_CUBE_SIDE_LENGTH * RUBIX_CUBE_SIDE_LENGTH
-#define RUBIX_CUBE_PIECES_PER_FACE RUBIX_CUBE_PIECES_PER_PLANE
+#define RUBIX_CUBE_PIECES_PER_PLANE 	RUBIX_CUBE_SIDE_LENGTH * RUBIX_CUBE_SIDE_LENGTH
+#define RUBIX_CUBE_PIECES_PER_FACE 	RUBIX_CUBE_PIECES_PER_PLANE
 
 /* Library types */
 
@@ -72,17 +72,17 @@ typedef enum rubix_cube_rotation_quadset {
 	RUBIX_CUBE_ROTATE_QUADSET_FULL  	/* 180 degree (aka  pi   radian) rotation */
 } RubixCubeRotationQuadset ;
  /* Important for dealing with quadsets */
-#define RUBIX_CUBE_PIECES_PER_QUADSET 4
+#define RUBIX_CUBE_PIECES_PER_QUADSET 	4
 
 typedef enum rubix_cube_face_rotation {
 	RUBIX_CUBE_FACE_ROTATION_CLOCKWISE,
 	RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE,
 	RUBIX_CUBE_FACE_ROTATION_DOUBLE
 } RubixCubeFaceRotation ;
-#define RUBIX_CUBE_FACE_ROTATION_COUNT 3
+#define RUBIX_CUBE_FACE_ROTATION_COUNT 	3
 
 /* Seed type of value for generation of scrambled rubix cube */
-typedef unsigned long long int rubix_cube_seed_t ;
+typedef unsigned long long int RubixCubeSeed ;
 // TODO: scrambling algorithm
 
 /*
@@ -135,7 +135,7 @@ typedef struct rubix_cube_face {
 			\
 			rubix_cube_id.planes[0][0].sides[RUBIX_CUBE_SQUARE_TOP], \
 			rubix_cube_id.planes[0][1].sides[RUBIX_CUBE_SQUARE_TOP], \
-			rubix_cube_id.planes[0][2].sides[RUBIX_CUBE_SQUARE_TOP] \
+			rubix_cube_id.planes[0][2].sides[RUBIX_CUBE_SQUARE_TOP]  \
 			\
 		} \
 	}
@@ -293,18 +293,25 @@ typedef struct rubix_cube_piece_reference {
 } RubixCubePieceReference ;
 
 typedef struct rubix_cube_face_rotation_data {
-	RubixCubePieceReference		corner_quadset[RUBIX_CUBE_PIECES_PER_QUADSET] ;
-	RubixCubePieceReference		side_quadset[RUBIX_CUBE_PIECES_PER_QUADSET] ;
-	RubixCubeSubrotationSet 	subrotation_set[RUBIX_CUBE_FACE_ROTATION_COUNT] ;
+	RubixCubePieceReference		corner_quadset	[RUBIX_CUBE_PIECES_PER_QUADSET] ;
+	RubixCubePieceReference		side_quadset	[RUBIX_CUBE_PIECES_PER_QUADSET] ;
+	RubixCubeSubrotationSet 	subrotation_set	[RUBIX_CUBE_FACE_ROTATION_COUNT] ;
 } RubixCubeFaceRotationData ;
+
+typedef struct rubix_cube_move {
+	RubixCubeSide side ;
+	RubixCubeFaceRotation rotation ;
+} RubixCubeMove ;
 
 /* Library Functions */
 
 RubixCube rubix_cube_generate_solved(void) ;
 
-RubixCube rubix_cube_generate_scrambled(rubix_cube_seed_t seed) ;
+#define RUBIX_CUBE_SCRAMBLE_INTENSITY 50
+RubixCube rubix_cube_generate_scrambled(RubixCubeSeed seed) ;
 
 void rubix_cube_print_ascii(FILE * output_file, RubixCube * pRubix_cube) ;
+void rubix_cube_print_ascii_double(FILE * output_file, RubixCube * pRubix_cube) ;
 void rubix_cube_print_ascii_stdout(RubixCube * pRubix_cube) ;
 
 void rubix_cube_print_face_ascii(FILE * output_file, RubixCube * pRubix_cube, RubixCubeSide side) ;
@@ -320,10 +327,23 @@ void rubix_cube_print_piece(RubixCubePiece piece) ;
 void rubix_cube_print_piece_from_cube(RubixCube * pRubix_cube, unsigned plane, unsigned index) ;
 
 int rubix_cube_is_solved(RubixCube * pRubix_cube) ;
+int rubix_cube_equivelence_check(RubixCube * first, RubixCube * second) ;
 
 /*
  * TODO: documentation
  */
 void rubix_cube_rotate_face(RubixCube * pRubix_cube, RubixCubeSide side, RubixCubeFaceRotation face_rotation) ;
+
+void rubix_cube_apply_move(RubixCube * pRubixCube, RubixCubeMove * move) ;
+void rubix_cube_unapply_move(RubixCube * pRubixCube, RubixCubeMove * move) ;
+void rubix_cube_print_move_string(RubixCubeMove * move) ;
+
+RubixCubeMove rubix_cube_generate_random_move() ;
+void rubix_cube_generate_moves_from_seed(RubixCubeSeed seed, size_t number_of_moves, RubixCubeMove * dest) ;
+
+const char * rubix_cube_get_side_string(RubixCubeSide side) ;
+const char * rubix_cube_get_face_rotation_string(RubixCubeFaceRotation rotation) ;
+
+void rubix_cube_solve_scrambled_from_seed(RubixCube * pRubix_cube, RubixCubeSeed seed) ;
 
 #endif // RUBIX_CUBE_H
