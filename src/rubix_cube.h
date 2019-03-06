@@ -360,6 +360,7 @@ const char * rubix_cube_get_face_rotation_string(RubixCubeFaceRotation rotation)
 
 void rubix_cube_solve_scrambled_from_seed(RubixCube * pRubix_cube, RubixCubeSeed seed) ;
 
+/* begin scramble section */
 RubixCubeScramble * rubix_cube_scramble_allocate(RubixCubeSeed seed,size_t intensity) ;
 void rubix_cube_scramble_free() ;
 

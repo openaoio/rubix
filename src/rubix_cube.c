@@ -916,10 +916,12 @@ RubixCubeScramble * rubix_cube_scramble_allocate(RubixCubeSeed seed,size_t inten
 	RubixCubeScramble * pNew ;
 	if (!(pNew = (RubixCubeScramble *)malloc(sizeof(RubixCubeScramble)))) return NULL ;
 
-	pNew->capacity = intensity ;
+
+	/* intensity 0 will allocate a bunch of blank space for scrambles */
+	pNew->capacity = intensity ? intensity : RUBIX_CUBE_SCRAMBLE_INTENSITY ;
 	if(!(pNew->moves = (RubixCubeMove *)malloc(sizeof(RubixCubeMove) * pNew->capacity))) {
 		free(pNew); return NULL ;
-	} pNew->size = pNew->capacity ;
+	} pNew->size = intensity ? pNew->capacity : 0 ;
 
 	pNew->seed = seed ? seed : rubix_cube_generate_seed() ;
 	rubix_cube_generate_moves_from_seed(
