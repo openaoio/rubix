@@ -369,22 +369,4 @@ void rubix_cube_unapply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pS
 
 RubixCubeSeed rubix_cube_generate_seed() ;
 
-/* begin monkey section */
-
-typedef enum rubix_cube_monkey_office {
-	RUBIX_CUBE_MONKEY_ENTREPRENEUR, /* this one works 80+ hours per week */
-	RUBIX_CUBE_MONKEY_MANAGER,	/* this one works close to 60 */
-	RUBIX_CUBE_MONKEY_WORKER	/* a purely 9-5 kind of monkey */
-} RubixCubeMonkeyOffice ;
-
-typedef struct rubix_cube_monkey RubixCubeMonkey ;
-typedef struct rubix_cube_monkey {
-	RubixCube * 			cube ;
-	pthread_mutex_t			cube_mutex ;
-	RubixCubeMonkeyOffice 		office ;
-	RubixCubeScramble * 		history ;
-	RubixCubeMonkey * 		direct_reports ;
-	size_t 				direct_report_count ;
-} RubixCubeMonkey ;
-
 #endif // RUBIX_CUBE_H

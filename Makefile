@@ -5,7 +5,7 @@
 CC 	= gcc
 CFLAGS  = -g -Wall -Werror -std=gnu11
 LFLAGS  = -fPIC -shared
-OBJECTS = rubix_cube.o
+OBJECTS = rubix_cube.o monkey.o
 TESTOBJ = test_rubix_cube.o
 TESTBIN	= test
 LIBNAME = librubix.so
