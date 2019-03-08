@@ -1,6 +1,24 @@
+/*
+    A simple rubix cube simulator.
+    Copyright (C) 2019 Joel Savitz <joelsavitz@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    A copy of the GNU General Public License can be found in the file
+    LICENSE, but if you prefer, see <https://www.gnu.org/licenses/>.
+*/
 #include "rubix_cube.h"
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 
 const char RUBIX_CUBE_COLOR_CHARS[] = {
 	'X', /* NULL */
@@ -854,6 +872,10 @@ inline RubixCubeMove rubix_cube_generate_random_move() {
 }
 
 void rubix_cube_generate_moves_from_seed(RubixCubeSeed seed, size_t number_of_moves, RubixCubeMove * dest) {
+	/* validity of @dest is a preconditon, so expect SIGSEGV if you ignore that requirement */
+	/* I'm not going to save any users, but I will print a message */
+	assert(dest) ;
+
 	srand(seed) ;
 	for(size_t i = 0; i < number_of_moves; ++i) {
 		dest[i] = rubix_cube_generate_random_move() ;

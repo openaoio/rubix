@@ -1,3 +1,44 @@
+/*
+    A simple rubix cube simulator.
+    Copyright (C) 2019 Joel Savitz <joelsavitz@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    A copy of the GNU General Public License can be found in the file
+    LICENSE, but if you prefer, see <https://www.gnu.org/licenses/>.
+*/
+
+
+/*
+ * Rubix cube model:
+ *(behind) +--+--+--+                            For each slice of 9 cubes (divided by the plane of the screen),
+ *  D    /  /  /  /|					there exists an array of RubixCubePiece objects
+ *  ->  +--+--+--+ |					arranged (i.e. indexed) like such. Let it be called a "plane"
+ *     /  /A /  /| |					+--+--+--+
+ *    +--+--+--+ | |				       / 0/ 1/ 2/|
+ *   /  /  /  /| |/| <-- E (behind)		      +--+--+--+ |
+ *  +--+--+--+ |/| |				0-->  |0 |1 |2 |2/
+ *  |  |  |  |/|C|/|      			      +--+--+--+ |
+ *  +--+--+--+ |/| |       2 			3-->  |3 |4 |5 |5/
+ *  |  |B |  |/| |/           _.		      +--+--+--+ |
+ *  +--+--+--+ |/        1    /|		6-->  |6 |7 |8 |8/
+ *  |  |  |  | /             /  		      +--+--+--+
+ *  +--+--+--+^         0   / Direction of array of rubix cube face arrays
+ *       F ^
+ * (behind)|
+ *
+ * Library functions will maintain this "perspective" unless otherwise noted.
+ * rubix_cube_rotate_quadset() is a notable exceptiong
+ */
+
 #ifndef RUBIX_CUBE_H
 #define RUBIX_CUBE_H "rubix_cube.h"
 
@@ -5,7 +46,7 @@
 
 #include <stdio.h>
 
-/* Library constants */
+/* Library types and constants */
 
 /* Faces/sides of a square. */
 #define RUBIX_CUBE_SIDE_COUNT 		6
@@ -17,8 +58,6 @@
 /* Determine the size of each plane (in pieces) as a constant at compile time */
 #define RUBIX_CUBE_PIECES_PER_PLANE 	RUBIX_CUBE_SIDE_LENGTH * RUBIX_CUBE_SIDE_LENGTH
 #define RUBIX_CUBE_PIECES_PER_FACE 	RUBIX_CUBE_PIECES_PER_PLANE
-
-/* Library types */
 
 typedef enum rubix_cube_side  {
 	RUBIX_CUBE_SIDE_NULL,
@@ -83,31 +122,6 @@ typedef enum rubix_cube_face_rotation {
 
 /* Seed type of value for generation of scrambled rubix cube */
 typedef unsigned long long int RubixCubeSeed ;
-// TODO: scrambling algorithm
-
-/*
- * Rubix cube model:
- *(behind) +--+--+--+                            For each slice of 9 cubes (divided by the plane of the screen),
- *  D    /  /  /  /|					there exists an array of RubixCubePiece objects
- *  ->  +--+--+--+ |					arranged (i.e. indexed) like such. Let it be called a "plane"
- *     /  /A /  /| |					+--+--+--+
- *    +--+--+--+ | |				       / 0/ 1/ 2/|
- *   /  /  /  /| |/| <-- E (behind)		      +--+--+--+ |
- *  +--+--+--+ |/| |				0-->  |0 |1 |2 |2/
- *  |  |  |  |/|C|/|      			      +--+--+--+ |
- *  +--+--+--+ |/| |       2 			3-->  |3 |4 |5 |5/
- *  |  |B |  |/| |/           _.		      +--+--+--+ |
- *  +--+--+--+ |/        1    /|		6-->  |6 |7 |8 |8/
- *  |  |  |  | /             /  		      +--+--+--+ 
- *  +--+--+--+^         0   / Direction of array of rubix cube face arrays
- *       F ^
- * (behind)|
- *
- * Library functions will maintain this "perspective" unless otherwise noted.
- * rubix_cube_rotate_quadset() is a notable exceptiong
- */
-
-
 
 typedef struct rubix_cube_piece {
 	/* Each piece is represented by an array for rubix cube colors in side order as documented above */
@@ -122,6 +136,8 @@ typedef struct rubix_cube {
 typedef struct rubix_cube_face {
 	RubixCubeColor squares[RUBIX_CUBE_PIECES_PER_FACE] ;
 } RubixCubeFace ;
+
+/* hardcoded offsets to retrieve faces with gusto */
 
 #define RUBIX_CUBE_GET_TOP_FACE(rubix_cube_id) \
 	(RubixCubeFace){ .squares = { \
@@ -220,6 +236,7 @@ typedef struct rubix_cube_face {
 		} \
 	}
 
+/* I don't know why anyone would use this one but I included it anyway for completeness */
 #define RUBIX_CUBE_GET_INVALID_FACE(rubix_cube_id) RUBIX_CUBE_FACE_NULL
 
 #define RUBIX_CUBE_FACE_NULL \
@@ -245,37 +262,271 @@ typedef struct rubix_cube_face {
 	(RubixCube) { \
 		.planes = { \
 				{ \
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } }, \
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_YELLOW } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_YELLOW } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_RED, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_YELLOW } }\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, /* top    */ \
+							RUBIX_CUBE_COLOR_RED,   /* front  */ \
+							RUBIX_CUBE_COLOR_NULL,  /* right  */ \
+							RUBIX_CUBE_COLOR_GREEN, /* left   */ \
+							RUBIX_CUBE_COLOR_NULL,  /* back   */ \
+							RUBIX_CUBE_COLOR_NULL   /* bototm */ \
+						} /* this scheme is used throughout this table */ \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					}, \
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_RED,   \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_YELLOW \
+						}   \
+					}\
 				},\
 				{ \
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } }, \
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL, 	\
+							RUBIX_CUBE_COLOR_NULL, 	\
+							RUBIX_CUBE_COLOR_NULL 	\
+						} \
+					}, \
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
 					RUBIX_CUBE_PIECE_NULL, /* Center of the cube */ \
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_YELLOW } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_YELLOW } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_YELLOW } }\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					}\
 				},\
 				{ \
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_NULL } }, \
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_WHITE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_NULL } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_GREEN, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_YELLOW } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_YELLOW } },\
-					(RubixCubePiece){ .sides = { RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_BLUE, RUBIX_CUBE_COLOR_NULL, RUBIX_CUBE_COLOR_ORANGE, RUBIX_CUBE_COLOR_YELLOW } }\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					}, \
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_WHITE, \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_NULL   \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_GREEN, \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					},\
+					(RubixCubePiece){ \
+						.sides = { \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_BLUE,  \
+							RUBIX_CUBE_COLOR_NULL,  \
+							RUBIX_CUBE_COLOR_ORANGE,\
+							RUBIX_CUBE_COLOR_YELLOW \
+						} \
+					}\
 				}\
 			}\
 		} \
@@ -310,15 +561,23 @@ typedef struct rubix_cube_scramble {
 	RubixCubeSeed 			seed ;
 } RubixCubeScramble ;
 
+#define RUBIX_CUBE_SCRAMBLE_INTENSITY 50
+
 /* Library Functions */
 
+/* Get a copy of the solved cube literal */
 RubixCube rubix_cube_generate_solved() ;
+
+/* Get a pointer to a freshly allocated copy of the solved cube literal */
 RubixCube * rubix_cube_allocate_solved() ;
 
-#define RUBIX_CUBE_SCRAMBLE_INTENSITY 50
+/* Scramble a copy of the cube literal based on the provided seed value */
 RubixCube rubix_cube_generate_scrambled(RubixCubeSeed seed) ;
+
+/* Return a pointer to a freshly allocated cube based on the provided seed value */
 RubixCube * rubix_cube_allocate_scrambled(RubixCubeSeed seed) ;
 
+/* TODO: rename these functons to something that makes sense */
 void rubix_cube_print_ascii(FILE * output_file, RubixCube * pRubix_cube) ;
 void rubix_cube_print_ascii_double(FILE * output_file, RubixCube * pRubix_cube) ;
 void rubix_cube_print_ascii_stdout(RubixCube * pRubix_cube) ;
@@ -326,43 +585,72 @@ void rubix_cube_print_ascii_double_stdout(RubixCube * pRubix_cube) ;
 
 void rubix_cube_print_face_ascii(FILE * output_file, RubixCube * pRubix_cube, RubixCubeSide side) ;
 
+/* Free all memory allocated to a rubix cube object */
 void rubix_cube_free(RubixCube * pRubix_cube) ;
-void rubix_cube_rotate_front_face(RubixCube * pRubix_cube, RubixCubeFaceRotation face_rotation) ;
-void rubix_cube_rotate_top_face(RubixCube * pRubix_cube, RubixCubeFaceRotation face_rotation) ;
 
+/* Swap individual pieces of the cube in place */
 void rubix_cube_swap_pieces(RubixCubePiece * first, RubixCubePiece * second) ;
 
+/* print a list of the colors on each side of a piec to stdout */
 void rubix_cube_print_piece(RubixCubePiece piece) ;
+
+/* print a list of the colors on each side of a pice cube to stdout given offsets */
 void rubix_cube_print_piece_from_cube(RubixCube * pRubix_cube, unsigned plane, unsigned index) ;
 
+/* Return 0 if the cube is not solved, else reutrn nonzero value */
 int rubix_cube_is_solved(RubixCube * pRubix_cube) ;
+
+/* Return nonzero if the two cubes have identical values for every piece, else return 0 */
 int rubix_cube_equivelence_check(RubixCube * first, RubixCube * second) ;
+
+/* Return the number of rotations made to scramble the cube by default */
 int rubix_cube_get_default_scramble_intensity() ;
 
-/*
- * TODO: documentation
- */
+/* Rotate a face of a rubix cube by pi/2, -pi/2, or pi radians */
 void rubix_cube_rotate_face(RubixCube * pRubix_cube, RubixCubeSide side, RubixCubeFaceRotation face_rotation) ;
-void rubix_cube_rotate_face_strings(RubixCube * pRubix_cube, const char * side, const  char * face_rotation) ;
 
+//TODO
+/* Same as rotate_face() but side and rotation can be specified by a character string */
+//void rubix_cube_rotate_face_strings(RubixCube * pRubix_cube, const char * side, const  char * face_rotation) ;
+
+/* Apply a move to a rubix cube from a move object */
 void rubix_cube_apply_move(RubixCube * pRubixCube, RubixCubeMove * move) ;
+
+/* Apply a move to a rubix cube that is the reverse of one specified in a RubixCubeMove object */
 void rubix_cube_unapply_move(RubixCube * pRubixCube, RubixCubeMove * move) ;
+
+/* Print a string describing a RubixCubeMove in plain English */
 void rubix_cube_print_move_string(RubixCubeMove * move) ;
 
+/* Generate a random valid RubixCubeMove */
 RubixCubeMove rubix_cube_generate_random_move() ;
+
+/* Generate the first @number_of_moves from a seed, place results in @dest */
+/* Precondition: dest points to @number_of_moves * sizeof(RubixCubeMove) allocated bytes */
 void rubix_cube_generate_moves_from_seed(RubixCubeSeed seed, size_t number_of_moves, RubixCubeMove * dest) ;
 
+/* Get a character string representing a RubixCubeSide value in English */
 const char * rubix_cube_get_side_string(RubixCubeSide side) ;
+
+/* Get a character string representing a RubixCubeRotation value in English */
 const char * rubix_cube_get_face_rotation_string(RubixCubeFaceRotation rotation) ;
 
+/* Unapply RUBIX_CUBE_SCRAMBLE_INTENSITY moves generated from @seed on @pRubix_cube */
 void rubix_cube_solve_scrambled_from_seed(RubixCube * pRubix_cube, RubixCubeSeed seed) ;
 
+/* Generate a RubixCubeScrambl filled with randomly generated RubixCubeMoves, return ptr to object */
 RubixCubeScramble * rubix_cube_scramble_allocate() ;
+
+/* Free all memory associated with a RubixCubeScramble object */
 void rubix_cube_scramble_free() ;
 
+/* Apply all moves in a @pScramble to @pRubix_cube */
 void rubix_cube_apply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) ;
+
+/* Unapply all moves in a @pScramble to @pRubix_cube */
 void rubix_cube_unapply_scramble(RubixCube * pRubix_cube, RubixCubeScramble * pScramble) ;
 
+/* Get a random rubix cube seed */
 RubixCubeSeed rubix_cube_generate_seed() ;
 
 #endif // RUBIX_CUBE_H
