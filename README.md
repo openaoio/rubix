@@ -16,6 +16,7 @@
 #### In Development:
 
 * Enhancements to interactive rubix cube shell via python
+* Monkeys
 
 #### Down the road:
 
