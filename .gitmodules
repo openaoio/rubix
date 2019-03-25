@@ -1,3 +1,6 @@
 [submodule "lil_test"]
 	path = lil_test
 	url = git@github.com:theyoyojo/lil_test
+[submodule "dynamic-ffi"]
+	path = dynamic-ffi
+	url = git@github.com:theyoyojo/dynamic-ffi
