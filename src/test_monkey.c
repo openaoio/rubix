@@ -5,6 +5,7 @@ TEST_SET(create_destroy,
 	TEST_CASE(default,
 		Monkey * joe = monkey_birth() ;
 		printf("monkey is at %p\n",joe) ;
+		printf("cube is at %p\n",joe->cube) ;
 		monkey_death(&joe) ;
 	)
 

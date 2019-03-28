@@ -123,7 +123,6 @@ typedef enum rubix_cube_face_rotation {
 
 /* Seed type of value for generation of scrambled rubix cube */
 typedef unsigned long long int RubixCubeSeed ;
-<<<<<<< HEAD
 // TODO: scrambling algorithm
 
 /*
@@ -148,9 +147,6 @@ typedef unsigned long long int RubixCubeSeed ;
  * rubix_cube_rotate_quadset() is a notable exception
  */
 
-
-=======
->>>>>>> monkeys_new
 
 typedef struct rubix_cube_piece {
 	/* Each piece is represented by an array for rubix cube colors in side order as documented above */
