@@ -1,5 +1,5 @@
 #include "rubix_cube.h"
-#include "../lil_test/src/lil_test.h"
+#include <lil_test.h>
 #include <time.h>
 
 
