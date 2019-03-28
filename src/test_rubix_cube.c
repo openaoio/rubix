@@ -1,5 +1,5 @@
 #include "rubix_cube.h"
-#include "../lil_test/src/lil_test.h"
+#include <lil_test.h>
 #include <time.h>
 
 
@@ -42,16 +42,16 @@ TEST_SET(rotate_front,
 	TEST_CASE(four_times_clockwise,
 		RubixCube * test = rubix_cube_allocate_solved() ;	
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
 		ASSERT(rubix_cube_is_solved(test)) ;
 		rubix_cube_free(test) ;	
 	) ;
@@ -59,12 +59,12 @@ TEST_SET(rotate_front,
 	TEST_CASE(four_times_counterclockwise,
 		RubixCube * test = rubix_cube_allocate_solved() ;	
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
 		ASSERT(rubix_cube_is_solved(test)) ;
 
 		rubix_cube_free(test) ;	
@@ -73,10 +73,10 @@ TEST_SET(rotate_front,
 	TEST_CASE(twice_double,
 		RubixCube * test = rubix_cube_allocate_solved() ;	
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
 		ASSERT(rubix_cube_is_solved(test)) ;
 
 		rubix_cube_free(test) ;	
@@ -96,12 +96,12 @@ TEST_SET(rotate_top,
 	TEST_CASE(four_times_clockwise,
 		RubixCube * test = rubix_cube_allocate_solved() ;	
 
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_CLOCKWISE) ;
 		ASSERT(rubix_cube_is_solved(test)) ;
 
 		rubix_cube_free(test) ;	
@@ -110,12 +110,12 @@ TEST_SET(rotate_top,
 	TEST_CASE(four_times_counterclockwise,
 		RubixCube * test = rubix_cube_allocate_solved() ;	
 
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_COUNTERCLOCKWISE) ;
 		ASSERT(rubix_cube_is_solved(test)) ;
 
 		rubix_cube_free(test) ;	
@@ -124,10 +124,10 @@ TEST_SET(rotate_top,
 	TEST_CASE(twice_double,
 		RubixCube * test = rubix_cube_allocate_solved() ;	
 
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
-		rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+		rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
 		ASSERT(rubix_cube_is_solved(test)) ;
 
 		rubix_cube_free(test) ;	
@@ -138,15 +138,15 @@ TEST_SET(rotation_combos,
 	TEST_CASE(top_front_undo,
 		RubixCube * test = rubix_cube_allocate_solved() ;	
 		for(unsigned i = 0 ; i < 4; ++i){
-			rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
-			rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+			rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+			rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
 		}
 
 		ASSERT(!rubix_cube_is_solved(test)) ;
 
 		for(unsigned i = 0 ; i < 2; ++i){
-			rubix_cube_rotate_front_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
-			rubix_cube_rotate_top_face(test,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+			rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_FRONT,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
+			rubix_cube_rotate_face(test,RUBIX_CUBE_SQUARE_TOP,RUBIX_CUBE_FACE_ROTATION_DOUBLE) ;
 		}
 
 		ASSERT(rubix_cube_is_solved(test)) ;

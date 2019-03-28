@@ -3,12 +3,17 @@
 # By Joel Savitz <jsavitz@redhat.com>
 
 CC 	= gcc
-CFLAGS  = -g -Wall -Werror -std=gnu11
+CFLAGS  = -g -Wall -Werror -std=gnu11 -I./lil_test/src
 LFLAGS  = -fPIC -shared
+
 OBJECTS = rubix_cube.o monkey.o
 TESTOBJ = test_rubix_cube.o
+MONKEYO = test_monkey.o
+
 TESTBIN	= test
+MONKEYB = test_monkey
 LIBNAME = librubix.so
+
 SRCDIR  = src
 OBJDIR  = obj
 
@@ -18,6 +23,9 @@ all: $(OBJDIR) $(OBJECTS)
 test: $(OBJDIR) $(OBJECTS) $(TESTOBJ)
 	$(CC) $(CFLAGS) $(patsubst %.o,$(OBJDIR)/%.o, $(OBJECTS)) $(patsubst %.o,$(OBJDIR)/%.o, $(TESTOBJ)) -o $(TESTBIN)
 
+test_monkeys: $(OBJDIR) $(OBJECTS) $(MONKEYO)
+	$(CC) $(CFLAGS) $(patsubst %.o,$(OBJDIR)/%.o, $(OBJECTS)) $(patsubst %.o,$(OBJDIR)/%.o, $(MONKEYO)) -o $(MONKEYB)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o 
 .PHONEY: clean $(OBJDIR)
@@ -25,7 +33,7 @@ $(OBJDIR):
 	mkdir $(OBJDIR)
 
 clean:
-	rm -rf $(TESTBIN) $(LIBNAME) $(OBJDIR)
+	rm -rf $(TESTBIN) $(MONKEYB) $(LIBNAME) $(OBJDIR)
 
 %.o: $(SRCDIR)/%.c
 	$(CC) $(LFLAGS) $(CFLAGS) -c $^ -o $(OBJDIR)/$@
