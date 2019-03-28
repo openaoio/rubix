@@ -45,6 +45,7 @@
 /* Library dependencies */
 
 #include <stdio.h>
+#include <pthread.h> /* for monkeys */
 
 /* Library types and constants */
 
@@ -122,13 +123,39 @@ typedef enum rubix_cube_face_rotation {
 
 /* Seed type of value for generation of scrambled rubix cube */
 typedef unsigned long long int RubixCubeSeed ;
+// TODO: scrambling algorithm
+
+/*
+ * Rubix cube model:
+ *(behind) +--+--+--+                            For each slice of 9 cubes (divided by the plane of the screen),
+ *  D    /  /  /  /|					there exists an array of RubixCubePiece objects
+ *  ->  +--+--+--+ |					arranged (i.e. indexed) like such. Let it be called a "plane"
+ *     /  /A /  /| |					+--+--+--+
+ *    +--+--+--+ | |				       / 0/ 1/ 2/|
+ *   /  /  /  /| |/| <-- E (behind)		      +--+--+--+ |
+ *  +--+--+--+ |/| |				0-->  |0 |1 |2 |2/
+ *  |  |  |  |/|C|/|      			      +--+--+--+ |
+ *  +--+--+--+ |/| |       2 			3-->  |3 |4 |5 |5/
+ *  |  |B |  |/| |/           _.		      +--+--+--+ |
+ *  +--+--+--+ |/        1    /|		6-->  |6 |7 |8 |8/
+ *  |  |  |  | /             /  		      +--+--+--+ 
+ *  +--+--+--+^         0   / Direction of array of rubix cube face arrays
+ *       F ^
+ * (behind)|
+ *
+ * Library functions will maintain this "perspective" unless otherwise noted.
+ * rubix_cube_rotate_quadset() is a notable exception
+ */
+
 
 typedef struct rubix_cube_piece {
 	/* Each piece is represented by an array for rubix cube colors in side order as documented above */
 	RubixCubeColor sides[RUBIX_CUBE_SIDE_COUNT] ;
 } RubixCubePiece ;
 
+size_t rubix_cube_global_count ;
 typedef struct rubix_cube {
+	size_t ID ;
 	RubixCubePiece planes[RUBIX_CUBE_PLANE_COUNT][RUBIX_CUBE_PIECES_PER_PLANE] ;
 } RubixCube ;
 
@@ -539,8 +566,8 @@ typedef struct rubix_cube_subrotation_set {
 } RubixCubeSubrotationSet ;
 
 typedef struct rubix_cube_piece_reference {
-	size_t plane ;
-	size_t index ;
+	size_t 				plane ;
+	size_t 				index ;
 } RubixCubePieceReference ;
 
 typedef struct rubix_cube_face_rotation_data {
@@ -638,10 +665,14 @@ const char * rubix_cube_get_face_rotation_string(RubixCubeFaceRotation rotation)
 /* Unapply RUBIX_CUBE_SCRAMBLE_INTENSITY moves generated from @seed on @pRubix_cube */
 void rubix_cube_solve_scrambled_from_seed(RubixCube * pRubix_cube, RubixCubeSeed seed) ;
 
-/* Generate a RubixCubeScrambl filled with randomly generated RubixCubeMoves, return ptr to object */
+/* begin scramble section */
+RubixCubeScramble * rubix_cube_scramble_allocate(RubixCubeSeed seed,size_t intensity) ;
+
+/* Generate a RubixCubeScramble filled with randomly generated RubixCubeMoves, return ptr to object */
 RubixCubeScramble * rubix_cube_scramble_allocate() ;
 
 /* Free all memory associated with a RubixCubeScramble object */
+
 void rubix_cube_scramble_free() ;
 
 /* Apply all moves in a @pScramble to @pRubix_cube */
