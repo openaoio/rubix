@@ -32,6 +32,9 @@ test_monkeys: $(OBJDIR) $(OBJECTS) $(MONKEYO)
 $(OBJDIR):
 	mkdir $(OBJDIR)
 
+# ;)
+clena: clean
+
 clean:
 	rm -rf $(TESTBIN) $(MONKEYB) $(LIBNAME) $(OBJDIR)
 

@@ -13,16 +13,19 @@ typedef enum monkey_role {
 	MONKEY_UNEMPLOYED	/* this one is in an error state 	*/
 } MonkeyRole ;
 
-typedef struct monkey_staff {
-	
-} MonkeyStaff ;
+typedef struct monkey_staff MonkeyStaff ;
 
 typedef struct monkey {
 	RubixCube * 			cube ;
 	pthread_mutex_t			cube_mutex ;
 	RubixCubeScramble * 		history ;
-	MonkeyStaff 			staff ;
+	MonkeyStaff * 			staff ;
 } Monkey ;
+
+typedef struct monkey_staff {
+	Monkey *			personnel ;
+	size_t				headcount ;
+} MonkeyStaff ;
 
 /* end monkey type section */
 
