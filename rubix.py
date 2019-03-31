@@ -12,6 +12,19 @@ librubix = ctypes.CDLL("./librubix.so")
 # librubix.rubix_cube_solve_scrambled_from_seed(cuberef,seed)
 # librubix.rubix_cube_print_ascii_double_stdout(cuberef)
 
+librubix.rubix_cube_print_ascii_double_stdout.argtypes = [ctypes.c_void_p]
+
+librubix.rubix_cube_allocate_scrambled.restype = ctypes.c_void_p
+librubix.rubix_cube_allocate_solved.restype = ctypes.c_void_p
+
+librubix.rubix_cube_free.argtypes = [ctypes.c_void_p]
+librubix.rubix_cube_scramble_free.argtypes = [ctypes.c_void_p]
+
+librubix.rubix_cube_scramble_allocate.restype = ctypes.c_void_p
+librubix.rubix_cube_scramble_free.argtypes = [ctypes.c_void_p]
+
+librubix.rubix_cube_apply_scramble.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+librubix.rubix_cube_unapply_scramble.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
 
 # librubix.rubix_cube_free(cuberef)
 
@@ -69,7 +82,7 @@ class RubixCube:
             print("No scrambles in scramble history. Doing nothing.")
             return
         librubix.rubix_cube_unapply_scramble(self.ptr, self.scramble_ptrs[-1 * history_depth])
-        self.scramble_ptrs.pop()
+        librubix.rubix_cube_scramble_free(self.scramble_ptrs.pop())
 
     def reset(self):
         librubix.rubix_cube_free(self.ptr)
