@@ -26,6 +26,10 @@ librubix.rubix_cube_scramble_free.argtypes = [ctypes.c_void_p]
 librubix.rubix_cube_apply_scramble.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
 librubix.rubix_cube_unapply_scramble.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
 
+librubix.rubix_cube_rotate_face.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+
+librubix.rubix_cube_is_solved.argtypes = [ctypes.c_void_p]
+
 # librubix.rubix_cube_free(cuberef)
 
 class RubixCube:
@@ -147,12 +151,17 @@ monkeys:    a million monkeys and a million typewriters...\n"
                 matching_options.append(string)
         return matching_options
 
+    def solve_by_brute_force(self,tokens):
+        print("Unimplemented stub")
+
+
     def rotate(self,tokens):
         face = "invalid"
         rotation = "invalid"
         
         if len(tokens) < 3:
             print("Rotation failed: not enough arguments")
+            return
         
         if tokens[1] not in self.cube.FACES:
             print("Rotation failed: invalid face")
@@ -191,8 +200,8 @@ monkeys:    a million monkeys and a million typewriters...\n"
         else:
             print("The cube is scrambled")
 
-    def monkeys(self,tokens):
-        if not self.cube.is_solved()
+    # def monkeys(self,tokens):
+    #     if not self.cube.is_solved()
 
 
     MAXIMUM_ARCHEOLOGY = 50 # arbitrary
